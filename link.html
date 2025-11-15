@@ -514,6 +514,90 @@
             </div>
         </div>
     </div>
+    <script>
+        		
+        // Variabel ini akan diisi oleh fungsi async, 
+        // tapi kita definisikan di sini agar bisa diakses global jika script1.js memerlukannya.
+        let bugOptions = []; 
+
+        /**
+         * Mengambil daftar URL dari GitHub dan mengubahnya menjadi array bugOptions.
+         */
+        async function getBugOptions() {
+            const dataUrl = "customdomain.txt?v=" + new Date().getTime();
+            let urlList = [];
+
+            try {
+                const response = await fetch(dataUrl);
+                if (!response.ok) {
+                    throw new Error(`Gagal mengambil data, status: ${response.status}`);
+                }
+                const textData = await response.text();
+                // Filter baris kosong
+                urlList = textData.split('\n').filter(line => line.trim() !== '');
+            } catch (error) {
+                console.error("Gagal memuat daftar URL bug:", error);
+                // Biarkan urlList kosong, tapi 'Default' dan 'Manual' akan tetap ada
+            }
+
+            // Kembalikan array bugOptions yang sudah jadi
+            return [
+                { value: "", label: "Default" },
+                { value: "manual", label: "Input Manual" },
+                ...urlList.map(url => ({ value: url, label: url }))
+            ];
+        }
+
+        /**
+         * Mengisi semua dropdown bug (vless, trojan, ss) dengan data.
+         */
+        async function populateAllBugDropdowns() {
+            // ID dari semua dropdown yang ingin diisi
+            const dropdownIds = ["vless-bug", "trojan-bug", "ss-bug"];
+            
+            // Tampilkan "Memuat..." di semua dropdown
+            dropdownIds.forEach(id => {
+                const dropdown = document.getElementById(id);
+                if (dropdown) {
+                    dropdown.innerHTML = "<option value=''>Memuat bug...</option>";
+                }
+            });
+
+            // 1. Ambil data (hanya sekali)
+            const bugOptionsData = await getBugOptions();
+            
+            // Simpan ke variabel global jika script1.js perlu membacanya
+            bugOptions = bugOptionsData; 
+
+            // 2. Loop setiap ID dropdown dan isi
+            dropdownIds.forEach(id => {
+                const dropdown = document.getElementById(id);
+                if (!dropdown) {
+                    // Jika elemen tidak ditemukan, lewati
+                    return; 
+                }
+                
+                // Kosongkan dari "Memuat..."
+                dropdown.innerHTML = ""; 
+
+                // 3. Loop setiap item data dan buat <option>
+                bugOptionsData.forEach(item => {
+                    const optionElement = document.createElement("option");
+                    optionElement.value = item.value;
+                    optionElement.textContent = item.label;
+                    dropdown.appendChild(optionElement);
+                });
+            });
+
+            // console.log("Semua dropdown bug berhasil dimuat."); // Opsional: untuk debugging
+        }
+
+        // --- PANGGIL FUNGSI UNTUK MEMULAI ---
+        // Panggil fungsi ini saat script dimuat
+        // Ini akan berjalan, mengambil data, dan mengisi dropdown
+        // sebelum atau saat script1.js (defer) dieksekusi.
+        populateAllBugDropdowns();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 
