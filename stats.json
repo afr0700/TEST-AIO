@@ -1,8 +1,8 @@
 {
-  "failed": 23661,
-  "success": 1339,
+  "failed": 23654,
+  "success": 1346,
   "total": 25000,
-  "successRate": "5.36%",
-  "countriesCount": 60,
-  "timestamp": "2026-10-08T12:50:29.405Z"
+  "successRate": "5.38%",
+  "countriesCount": 58,
+  "timestamp": "2026-10-08T22:55:58.668Z"
 }
